@@ -2,6 +2,16 @@ import re
 import os.path
 from datetime import datetime, date
 from telethon import TelegramClient
+import logging
+import sys
+
+LOG_FILE_PATH = r"vacancy-post-scheduler-log_file.txt"
+logging.basicConfig(filename=LOG_FILE_PATH,
+                    format='%(asctime)s %(message)s',
+                    filemode='w')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 class Job:
@@ -32,7 +42,7 @@ class Job:
 
 file_name = "vacancy_list.txt"
 if not os.path.isfile(file_name):
-    print("CAN'T FIND CONFIG FILE " + file_name)
+    logger.info("CAN'T FIND CONFIG FILE " + file_name)
     quit()
 
 with open(file_name, encoding='utf-8', mode='r') as file:
@@ -51,18 +61,18 @@ client = TelegramClient('anon', app_id, api_hash)
 
 async def main():
     me = await client.get_me()
-    print("INFO ABOUT ME:")
-    print(me.stringify())
+    logger.info("INFO ABOUT ME:")
+    logger.info(me.stringify())
     async for dialog in client.iter_dialogs():
-        print(dialog.name, 'has ID', dialog.id)
+        logger.info(dialog.name + " has ID " + str(dialog.id))
     if len(all_data_arr) < 2:
-        print("Can't find vacancies in file", file_name)
+        logger.info("Can't find vacancies in file", file_name)
         quit()
     vacancies = all_data_arr[1]
 
-    print(vacancies)
+    logger.info(vacancies)
     raw = vacancies.split("----\n")
-    print(raw)
+    logger.info(raw)
     jobs = []
     for job in raw:
         result = job.split("-\n")
@@ -70,10 +80,10 @@ async def main():
         vacancy_text = result[2]
         all_chat_ids = result[0].split(",")
         for chat_id in all_chat_ids:
-            chat_id = re.sub("\s+", ' ', chat_id)
+            chat_id = re.sub(r"\s+", ' ', chat_id)
             jobs.append(Job(chat_id, post_at_time, vacancy_text))
 
-    print(jobs)
+    logger.info(jobs)
 
     if is_start_send.lower() == 'true':
         today = date.today()
