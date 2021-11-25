@@ -66,7 +66,13 @@ async def main():
     jobs = []
     for job in raw:
         result = job.split("-\n")
-        jobs.append(Job(result[0], "".join(result[1].split()).replace('\n', ' '), result[2]))
+        post_at_time = "".join(result[1].split()).replace('\n', ' ')
+        vacancy_text = result[2]
+        all_chat_ids = result[0].split(",")
+        for chat_id in all_chat_ids:
+            chat_id = re.sub("\s+", ' ', chat_id)
+            jobs.append(Job(chat_id, post_at_time, vacancy_text))
+
     print(jobs)
 
     if is_start_send.lower() == 'true':
