@@ -43,7 +43,7 @@ class Job:
 file_name = "vacancy_list.txt"
 if not os.path.isfile(file_name):
     logger.info("CAN'T FIND CONFIG FILE " + file_name)
-    quit()
+    sys.exit()
 
 with open(file_name, encoding='utf-8', mode='r') as file:
     text = file.read()
@@ -67,7 +67,7 @@ async def main():
         logger.info(dialog.name + " has ID " + str(dialog.id))
     if len(all_data_arr) < 2:
         logger.info("Can't find vacancies in file", file_name)
-        quit()
+        sys.exit()
     vacancies = all_data_arr[1]
 
     logger.info(vacancies)
